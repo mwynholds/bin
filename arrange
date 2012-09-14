@@ -1,0 +1,78 @@
+#!/usr/bin/ruby
+
+require 'osx/cocoa'
+include OSX
+OSX.require_framework 'ScriptingBridge'
+
+def run()
+  arrange 'Twitter', true, 0 => bounds(3407, 558, 378, 578)
+  arrange 'Messages', true, 'Buddies' => bounds(3792, 557, 190, 809), 'Messages' => bounds(2560, 630, 730, 545) do |app|
+    app.status = 1635148140
+    app.services.each do |service|
+      service.status = 1635148140 if service.enabled
+    end
+  end
+  arrange 'Skype', true, 'Skype' => bounds(2687, 607, 1042, 743)
+  arrange 'Google Chrome', true, 0 => bounds(162, 72, 2006, 1121)
+  arrange 'Terminal', true, 0 => bounds(1271, 147, 1145, 1185), 1 => bounds(105, 147, 1145, 1185)
+end
+
+def arrange(name, launch, windows)
+  app = app_for name
+  return unless app
+
+  windows.each do |name, bounds|
+    if name.is_a?(Integer)
+      window = app.windows.length > name ? app.windows[name] : nil
+    else
+      window = app.windows.find { |w| w.name == name }
+    end
+
+    if window
+      unless window.bounds == bounds
+        window.bounds = bounds
+      end
+    end
+  end
+
+  if block_given?
+    yield app
+  end
+end
+
+def app_for(name)
+  return nil unless is_running? name
+
+  app = SBApplication.applicationWithBundleIdentifier(bundle_id_for name)
+  app.activate
+  app
+end
+
+def bounds(x, y, w, h)
+  CGRect.new( CGPoint.new(x, y), CGSize.new(w, h) )
+end
+
+def bundle_id_for(name)
+  @processes[name.downcase]
+end
+
+def is_running?(name)
+  bundle_id_for name
+end
+
+def prepare()
+  system = SBApplication.applicationWithBundleIdentifier 'com.apple.systemevents'
+
+  @processes = {}
+  system.processes.each { |p| @processes[p.name.downcase.to_s] = p.bundleIdentifier }
+
+  @apps = {}
+  Dir['/Applications/*.app/Contents/Info.plist'].each do |ip|
+    puts ip
+  end
+end
+
+prepare
+run
+sleep 3
+run

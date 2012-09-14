@@ -1,0 +1,8 @@
+#!/usr/bin/ruby
+
+require 'osx/cocoa'
+include OSX
+OSX.require_framework 'ScriptingBridge'
+
+system = SBApplication.applicationWithBundleIdentifier 'com.apple.systemevents'
+p system.applicationProcesses.map &:name

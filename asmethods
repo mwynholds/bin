@@ -1,0 +1,29 @@
+#!/usr/local/bin/macruby
+
+if ARGV.length > 0 && ARGV[0] == '-h'
+  puts 'Usage asmethods <bundle_id> [code to eval]'
+  exit 0
+end
+
+framework 'Foundation'
+framework 'ScriptingBridge'
+
+bundle_id = ARGV[0] if ARGV.length > 0
+code = ARGV[1] if ARGV.length > 1
+
+obj = SBApplication
+
+if bundle_id
+  obj = obj.applicationWithBundleIdentifier bundle_id
+  if code
+    obj = eval "obj.#{code}"
+  end
+end
+
+methods = (obj.methods(true, true) - Object.new.methods(true, true)).sort
+
+puts "Methods for #{obj}"
+puts "------------------"
+methods.each do |method|
+  puts method
+end

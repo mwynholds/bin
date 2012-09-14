@@ -1,0 +1,28 @@
+#!/usr/bin/ruby
+
+require 'osx/cocoa'
+include OSX
+OSX.require_framework 'ScriptingBridge'
+
+@apps = %w{ com.twitter.twitter-mac com.apple.iChat com.skype.skype com.google.chrome com.apple.terminal }
+
+def run
+  @apps.each do |app|
+    log app_for(app)
+  end
+end
+
+def app_for(bundle_id)
+  app = SBApplication.applicationWithBundleIdentifier(bundle_id)
+  app.activate
+  app
+end
+
+def log(app)
+  puts "----- #{app.name} -----"
+  app.windows.each do |window|
+    puts "#{window.name} - #{window.bounds.inspect}"
+  end
+end
+
+run

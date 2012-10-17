@@ -5,6 +5,7 @@ include OSX
 OSX.require_framework 'ScriptingBridge'
 
 def run()
+  arrange 'Notes', true, 0 => bounds(16, 38, 350, 780)
   arrange 'Twitter', true, 0 => bounds(3407, 558, 378, 578)
   arrange 'Messages', true, 'Buddies' => bounds(3792, 557, 190, 809), 'Messages' => bounds(2560, 630, 730, 545) do |app|
     app.status = 1635148140
@@ -15,12 +16,33 @@ def run()
   arrange 'Skype', true, 'Skype' => bounds(2687, 607, 1042, 743)
   arrange 'Google Chrome', true, 0 => bounds(162, 72, 2006, 1121)
   arrange 'Terminal', true, 0 => bounds(1271, 147, 1145, 1185), 1 => bounds(105, 147, 1145, 1185)
+
+  sleep 3
+  rearrange
 end
 
 def arrange(name, launch, windows)
-  app = app_for name
+  app = app_for name, launch
   return unless app
 
+  @cache ||= {}
+  @cache[app] = windows
+  resize app, windows
+
+  if block_given?
+    yield app
+  end
+
+  app
+end
+
+def rearrange()
+  @cache.each do |app, windows|
+    resize app, windows
+  end
+end
+
+def resize(app, windows)
   windows.each do |name, bounds|
     if name.is_a?(Integer)
       window = app.windows.length > name ? app.windows[name] : nil
@@ -32,32 +54,31 @@ def arrange(name, launch, windows)
       unless window.bounds == bounds
         window.bounds = bounds
       end
+      ( window.miniaturized = false ) rescue nil
+      ( window.minimized = false ) rescue nil
     end
-  end
-
-  if block_given?
-    yield app
   end
 end
 
-def app_for(name)
-  return nil unless is_running? name
+def app_for(name, launch)
+  return nil unless launch || is_running?(name)
 
   app = SBApplication.applicationWithBundleIdentifier(bundle_id_for name)
+  puts "Unknown app: #{name}" if app.nil?
   app.activate
   app
 end
 
 def bounds(x, y, w, h)
-  CGRect.new( CGPoint.new(x, y), CGSize.new(w, h) )
+  NSRect.new x, y, w, h
 end
 
 def bundle_id_for(name)
-  @processes[name.downcase]
+  @processes[name.downcase] || @apps[name.downcase]
 end
 
 def is_running?(name)
-  bundle_id_for name
+  @processes[name.downcase]
 end
 
 def prepare()
@@ -67,12 +88,25 @@ def prepare()
   system.processes.each { |p| @processes[p.name.downcase.to_s] = p.bundleIdentifier }
 
   @apps = {}
-  Dir['/Applications/*.app/Contents/Info.plist'].each do |ip|
-    puts ip
+  dirs = [ '/Applications/*.app', '/Applications/*/*.app' ]
+  dirs.each do |dir|
+    Dir["#{dir}/Contents/Info.plist"].each do |ip|
+      matches = ip.match(/\/([^\.\/]+)\.app\//)
+      if matches && matches.length > 0
+        name = matches[1]
+        f = File.new ip
+        while ! f.eof?
+          line = f.readline.strip
+          if line == '<key>CFBundleIdentifier</key>'
+            id = f.readline.strip.gsub /<\/?string>/, ''
+            @apps[name.downcase] = id
+            next
+          end
+        end
+      end
+    end
   end
 end
 
 prepare
-run
-sleep 3
 run

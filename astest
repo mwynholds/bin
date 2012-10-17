@@ -4,5 +4,5 @@ require 'osx/cocoa'
 include OSX
 OSX.require_framework 'ScriptingBridge'
 
-system = SBApplication.applicationWithBundleIdentifier 'com.apple.systemevents'
-p system.applicationProcesses.map &:name
+finder = SBApplication.applicationWithBundleIdentifier 'com.apple.Finder'
+p finder.FinderWindows

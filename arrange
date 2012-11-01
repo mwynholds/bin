@@ -6,6 +6,7 @@ OSX.require_framework 'ScriptingBridge'
 
 def run()
   arrange 'Notes', true, 0 => bounds(16, 38, 350, 780)
+  arrange 'iTunes', false, 'iTunes' => bounds(58, 195, 1372, 830)
   arrange 'Twitter', true, 0 => bounds(3407, 558, 378, 578)
   arrange 'Messages', true, 'Buddies' => bounds(3792, 557, 190, 809), 'Messages' => bounds(2560, 630, 730, 545) do |app|
     app.status = 1635148140
@@ -44,6 +45,7 @@ end
 
 def resize(app, windows)
   windows.each do |name, bounds|
+    app_windows = app.windows.sort_by { |w| w.bounds.x }
     if name.is_a?(Integer)
       window = app.windows.length > name ? app.windows[name] : nil
     else

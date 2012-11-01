@@ -16,7 +16,7 @@ def run()
   end
   arrange 'Skype', true, 'Skype' => bounds(2687, 607, 1042, 743)
   arrange 'Google Chrome', true, 0 => bounds(162, 72, 2006, 1121)
-  arrange 'Terminal', true, 0 => bounds(1271, 147, 1145, 1185), 1 => bounds(105, 147, 1145, 1185)
+  arrange 'Terminal', true, 0 => bounds(105, 147, 1145, 1185), 1 => bounds(1271, 147, 1145, 1185)
 
   sleep 3
   rearrange
@@ -26,8 +26,8 @@ def arrange(name, launch, windows)
   app = app_for name, launch
   return unless app
 
-  @cache ||= {}
-  @cache[app] = windows
+  @cache ||= []
+  @cache << [app, windows]
   resize app, windows
 
   if block_given?
@@ -38,18 +38,18 @@ def arrange(name, launch, windows)
 end
 
 def rearrange()
-  @cache.each do |app, windows|
+  @cache.each do |(app, windows)|
     resize app, windows
   end
 end
 
 def resize(app, windows)
+  app_windows = app.windows.sort_by { |w| w.bounds.x }
   windows.each do |name, bounds|
-    app_windows = app.windows.sort_by { |w| w.bounds.x }
     if name.is_a?(Integer)
-      window = app.windows.length > name ? app.windows[name] : nil
+      window = app_windows.length > name ? app_windows[name] : nil
     else
-      window = app.windows.find { |w| w.name == name }
+      window = app_windows.find { |w| w.name == name }
     end
 
     if window

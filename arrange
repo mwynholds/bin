@@ -5,6 +5,7 @@ include OSX
 OSX.require_framework 'ScriptingBridge'
 
 def run()
+  arrange 'firefox', false, 0 => bounds(2582, 578, 1397, 822)
   arrange 'Notes', true, 0 => bounds(16, 38, 530, 780)
   arrange 'iTunes', false, 'iTunes' => bounds(58, 195, 1372, 830)
   arrange 'Twitter', true, 0 => bounds(3407, 558, 378, 578)

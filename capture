@@ -5,29 +5,37 @@ include OSX
 OSX.require_framework 'ScriptingBridge'
 
 def run
-  apps.each do |app|
-    log app_for(app)
+  processes.each do |process|
+    log process
   end
 end
 
-def app_for(bundle_id)
-  SBApplication.applicationWithBundleIdentifier(bundle_id)
+def app_for(process)
+  return unless process.hasScriptingTerminology
+  SBApplication.applicationWithBundleIdentifier process.bundleIdentifier.to_s
 end
 
-def log(app)
-  return unless app
-  name = app.name rescue return
-  puts "----- #{name} -----"
-  app.windows.each do |window|
-    puts "#{window.name} - #{window.bounds.inspect}"
+def log(process)
+  return if process.backgroundOnly
+  puts "[ #{process.name} ]"
+  app = app_for process
+  if app
+    name = app.name rescue return
+    app.windows rescue return
+    app.windows.each do |window|
+      wname = window.name
+      wname = '<blank>' unless wname && wname.strip != ''
+      puts "  #{wname} - #{window.bounds.inspect}"
+    end
   end
+  puts
 end
 
-def apps
+def processes
   system = SBApplication.applicationWithBundleIdentifier 'com.apple.systemevents'
-  system.processes.map { |p| p.bundleIdentifier.to_s }
+  system.processes
 end
 
-STDERR.reopen '/dev/null'
-STDERR.sync = true
+#STDERR.reopen '/dev/null'
+#STDERR.sync = true
 run

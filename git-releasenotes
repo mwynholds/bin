@@ -5,7 +5,7 @@ require 'set'
 commits = `git log #{ARGV[0]}`.lines
 
 notes = commits.reduce({}) do |memo, commit|
-  re = /(bug|feature|chore|release|hotfix)\/([\w-]+)/
+  re = /(bug|feature|chore|release|hotfix|spike)\/([\w-]+)/
   m = re.match commit
   if m
     type = m[1]
@@ -29,11 +29,16 @@ class String
   end
 end
 
-%w(hotfix feature bug chore).each do |type|
+def tracker_link(tracker_id)
+  return "" unless tracker_id
+  "([#{tracker_id}](https://www.pivotaltracker.com/story/show/#{tracker_id}))"
+end
+
+%w(hotfix feature bug chore spike).each do |type|
   if notes[type]
     puts "### #{type.capitalize.pluralize}"
     notes[type].each do |note|
-      puts "* #{note[:desc]} ([#{note[:tracker]}](https://www.pivotaltracker.com/story/show/#{note[:tracker]}))"
+      puts "* #{note[:desc]} #{tracker_link note[:tracker]}"
     end
     puts ""
   end

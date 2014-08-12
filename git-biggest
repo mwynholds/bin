@@ -1,0 +1,27 @@
+#!/usr/bin/ruby
+
+puts 'Generating file sha cache ...'
+files = Hash[ `git rev-list --objects --all`.split("\n").map { |line| line.split[0..1] } ]
+system 'git gc'
+print 'Finding really big files '
+
+dotter = Thread.new do
+  while true do
+    sleep 1
+    print '.'
+  end
+end
+
+big_shas = `git verify-pack -v .git/objects/pack/pack-*.idx`.split("\n").select { |line| line =~ /^\w+ blob\W+[0-9]+ [0-9]+ [0-9]+$/ }.each_with_index.map do |line, i|
+  parts = line.split
+  { sha: parts[0], size: parts[2].to_i, file: files[parts[0]] }
+end.sort_by { |o| o[:size] }.reverse
+
+dotter.kill
+
+puts
+puts
+
+big_shas[0..40].each do |big|
+  puts "#{'%30s' % big[:sha]} #{'%10d' % big[:size]} #{big[:file]}"
+end

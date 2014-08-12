@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+
+require 'set'
+
+commits = `git log #{ARGV[0]}`.lines
+
+notes = commits.reduce({}) do |memo, commit|
+  re = /(bug|feature|chore|release|hotfix)\/([\w-]+)/
+  m = re.match commit
+  if m
+    type = m[1]
+    desc = m[2]
+    tracker = nil
+    m2 = /^(.*)-([0-9]+)$/.match desc
+    if m2
+      desc = m2[1]
+      tracker = m2[2]
+    end
+    memo[type] ||= Set.new
+    memo[type] << { desc: desc, tracker: tracker }
+  end
+  memo
+end
+
+class String
+  def pluralize
+    return "#{self}es" if self =~ /[x]$/
+    "#{self}s"
+  end
+end
+
+%w(hotfix feature bug chore).each do |type|
+  if notes[type]
+    puts "### #{type.capitalize.pluralize}"
+    notes[type].each do |note|
+      puts "* #{note[:desc]} ([#{note[:tracker]}](https://www.pivotaltracker.com/story/show/#{note[:tracker]}))"
+    end
+    puts ""
+  end
+end

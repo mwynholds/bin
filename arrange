@@ -17,7 +17,7 @@ def run()
   end
   arrange 'Skype', true, 'Skype' => bounds(2616, 568, 1042, 743)
   arrange 'Google Chrome', true, 0 => bounds(162, 72, 2006, 1121)
-  arrange 'Terminal', true, 0 => bounds(105, 147, 1145, 1185), 1 => bounds(1271, 147, 1145, 1185)
+  # arrange 'Terminal', true, 0 => bounds(105, 147, 1145, 1185), 1 => bounds(1271, 147, 1145, 1185)
 
   #apps.each { |bundle_id| unhide bundle_id }
 

@@ -2,11 +2,12 @@
 
 require 'set'
 
-commits = `git log #{ARGV[0]}`.lines
+commits = `git log --merges --date=short --pretty=format:'%cd || %s || %cn' #{ARGV[0]}`.lines
 
 notes = commits.reduce({}) do |memo, commit|
+  date, subject, committers = commit.split('||')
   re = /(bug|feature|chore|release|hotfix|spike)\/([\w-]+)/
-  m = re.match commit
+  m = re.match subject
   if m
     type = m[1]
     desc = m[2]
@@ -17,7 +18,7 @@ notes = commits.reduce({}) do |memo, commit|
       tracker = m2[2]
     end
     memo[type] ||= Set.new
-    memo[type] << { desc: desc, tracker: tracker }
+    memo[type] << { desc: desc, tracker: tracker, date: date.strip, committers: committers.strip }
   end
   memo
 end
@@ -31,14 +32,14 @@ end
 
 def tracker_link(tracker_id)
   return "" unless tracker_id
-  "([#{tracker_id}](https://www.pivotaltracker.com/story/show/#{tracker_id}))"
+  " ([#{tracker_id}](https://www.pivotaltracker.com/story/show/#{tracker_id}))"
 end
 
 %w(hotfix feature bug chore spike).each do |type|
   if notes[type]
     puts "### #{type.capitalize.pluralize}"
     notes[type].each do |note|
-      puts "* #{note[:desc]} #{tracker_link note[:tracker]}"
+      puts "* [#{note[:date]}] #{note[:desc]}#{tracker_link note[:tracker]}"
     end
     puts ""
   end

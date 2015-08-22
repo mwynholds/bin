@@ -1,0 +1,3 @@
+#!/bin/bash
+
+seek ssh | grep -v ssh-agent | destroy

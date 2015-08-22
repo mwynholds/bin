@@ -1,11 +1,10 @@
-#!/System/Library/Frameworks/Ruby.framework/Versions/1.8/usr/bin/ruby
+#!/usr/bin/ruby
 
 require 'osx/cocoa'
 include OSX
 OSX.require_framework 'ScriptingBridge'
 
 def run()
-  arrange 'firefox', false, 0 => bounds(2582, 578, 1397, 822)
   arrange 'Notes', true, 0 => bounds(16, 38, 530, 780)
   arrange 'iTunes', false, 'iTunes' => bounds(58, 195, 1372, 830)
   arrange 'Twitter', true, 0 => bounds(3407, 558, 378, 578)
@@ -16,8 +15,8 @@ def run()
     end
   end
   arrange 'Skype', true, 'Skype' => bounds(2616, 568, 1042, 743)
-  arrange 'Google Chrome', true, 0 => bounds(162, 72, 2006, 1121)
-  # arrange 'Terminal', true, 0 => bounds(105, 147, 1145, 1185), 1 => bounds(1271, 147, 1145, 1185)
+  arrange 'firefox', true, '*' => bounds(162, 72, 2006, 1121)
+  arrange 'iTerm', true, 0 => bounds(994, 457, 1355, 728)
 
   #apps.each { |bundle_id| unhide bundle_id }
 
@@ -74,21 +73,23 @@ def rearrange()
   end
 end
 
-def resize(app, windows)
-  app_windows = app.windows.sort_by { |w| w.bounds.x }
-  windows.each do |name, bounds|
+def resize(app, wins)
+  app_windows = app.windows.reject { |w| w.name == '' }.sort_by { |w| w.bounds.x }
+  wins.each do |name, bounds|
     if name.is_a?(Integer)
-      window = app_windows.length > name ? app_windows[name] : nil
+      windows = app_windows.length > name ? [ app_windows[name] ] : nil
+    elsif name == '*'
+      windows = app_windows
     else
-      window = app_windows.find { |w| w.name == name }
+      windows = app_windows.select { |w| w.name == name }
     end
 
-    if window
-      unless window.bounds == bounds
-        window.bounds = bounds
+    if windows
+      windows.each do |window|
+        window.bounds = bounds unless window.bounds == bounds
+        ( window.miniaturized = false ) rescue nil
+        ( window.minimized = false ) rescue nil
       end
-      ( window.miniaturized = false ) rescue nil
-      ( window.minimized = false ) rescue nil
     end
   end
 end

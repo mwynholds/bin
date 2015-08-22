@@ -2,14 +2,21 @@
 
 require 'set'
 
+types = %w(hotfix feature bug chore spike)
+aliases = {
+  'release_fix' => 'bug'
+}
+
+types_re = (types + aliases.keys).join '|'
+
 commits = `git log --merges --date=short --pretty=format:'%cd || %s || %cn' #{ARGV[0]}`.lines
 
 notes = commits.reduce({}) do |memo, commit|
   date, subject, committers = commit.split('||')
-  re = /(bug|feature|chore|release|hotfix|spike)\/([\w-]+)/
+  re = /(#{types_re})\/([\w-]+)/
   m = re.match subject
   if m
-    type = m[1]
+    type = aliases[m[1]] || m[1]
     desc = m[2]
     tracker = nil
     m2 = /^(.*)-([0-9]+)$/.match desc
@@ -35,7 +42,7 @@ def tracker_link(tracker_id)
   " ([#{tracker_id}](https://www.pivotaltracker.com/story/show/#{tracker_id}))"
 end
 
-%w(hotfix feature bug chore spike).each do |type|
+types.each do |type|
   if notes[type]
     puts "### #{type.capitalize.pluralize}"
     notes[type].each do |note|

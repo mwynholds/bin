@@ -1,0 +1,4 @@
+#!/bin/bash
+
+mongo stickies_development --eval "db.dropDatabase()"
+mongorestore -h 127.0.0.1 -d stickies_development stickies/stickies_production

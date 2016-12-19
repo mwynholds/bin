@@ -1,0 +1,6 @@
+#!/bin/bash
+
+board=`cat stickies.log | grep join | grep $1 | head -1 | sed -e 's/^.* on //' | sed -e 's/ | .*$//'`
+first=`cat stickies.log | grep -F "$board" | head -1`
+last=`cat stickies.log | grep -F "$board" | tail -1`
+grep -F -A10000 "$first" stickies.log | grep -F -B10000 "$last" | grep -E "WARN|ERROR| at |$board" | grep -v "Screenshot request"

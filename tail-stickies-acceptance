@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rm -f /tmp/stickies-acceptance*.log
+ssh stickies-acceptance1 'tail -F /var/log/stickies.log' > /tmp/stickies-acceptance1.log &
+ssh stickies-acceptance2 'tail -F /var/log/stickies.log' > /tmp/stickies-acceptance2.log &
+sleep 2
+trap 'kill $(jobs -p)' EXIT
+tail -F /tmp/stickies-acceptance*.log

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+rm -f /tmp/stickies-prod*.log /tmp/stickies-worker*.log
+ssh stickies-prod1   'tail -F /var/log/stickies.log' > /tmp/stickies-prod1.log &
+ssh stickies-prod2   'tail -F /var/log/stickies.log' > /tmp/stickies-prod2.log &
+ssh stickies-prod3   'tail -F /var/log/stickies.log' > /tmp/stickies-prod3.log &
+ssh stickies-worker1 'tail -F /var/log/stickies.log' > /tmp/stickies-worker1.log &
+sleep 2
+trap 'kill $(jobs -p)' EXIT
+tail -F /tmp/stickies-prod*.log /tmp/stickies-worker*.log

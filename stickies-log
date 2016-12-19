@@ -1,0 +1,54 @@
+#!/usr/bin/env ruby
+
+require 'chronic'
+
+time = ARGV.join(' ').strip
+
+unless time && time.length > 0
+  puts "Usage: stickies-log <date_and_time>"
+  puts "       stickies-log today 2pm"
+  exit 1
+end
+
+time_start = Chronic.parse time
+unless time_start
+  puts "I didn't understand '#{time}"
+  exit 2
+end
+
+def format(d)
+  d.strftime "%F %T"
+end
+
+time_end = time_start + ( 60 * 60 ) # 1 hour
+print "Searching within #{format time_start} to #{format time_end}..."
+
+@out = []
+
+def parse(f, n, s, e)
+  track = false
+  date = nil
+  f.readlines.each_with_index do |line, i|
+    print "." if i % 100 == 0
+    matches = line.match(/^\[([0-9\-]+ [0-9:]+) .*/)
+    if matches
+      date = matches[1]
+      track = true if date >= s
+      track = false if date > e
+    end
+    @out << { line: line, date: date, i: i, n: n } if track
+  end
+end
+
+grep = time_start.strftime "%F"
+
+(1..3).each do |n|
+  IO.popen("ssh stickies-prod#{n} 'grep -h -A 999999 #{grep} /var/log/stickies.log*'") { |f| parse f, n, format(time_start), format(time_end) }
+end
+
+puts " done"
+puts ""
+
+@out.sort_by { |e| "#{e[:date]}-#{e[:n]}-#{e[:i]}" }.each do |e|
+  puts "#{e[:n]}: #{e[:line]}"
+end

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+tcpick -C -yP -r $1

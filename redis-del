@@ -1,0 +1,22 @@
+#!/bin/bash
+
+pattern="$1"
+db="$2"
+
+if [ "$pattern" == "" ]; then
+  echo "Usage: redis-del <pattern> [db]"
+  exit 1
+fi
+
+if [ "$db" == "" ]; then
+  db=0
+fi
+
+count=`redis-cli --raw keys "$pattern" | grep -v "^$" | wc -l | xargs`
+echo -n "Do you want to delete $count keys from redis (db $db)? (y or n) "
+
+read answer
+
+if [ "$answer" == 'y' ]; then
+  redis-cli --raw keys "$pattern" | xargs redis-cli DEL
+fi

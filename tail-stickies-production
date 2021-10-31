@@ -4,6 +4,10 @@ rm -f /tmp/stickies-prod*.log /tmp/stickies-worker*.log
 ssh stickies-prod1   'tail -F /var/log/stickies.log' > /tmp/stickies-prod1.log &
 ssh stickies-prod2   'tail -F /var/log/stickies.log' > /tmp/stickies-prod2.log &
 ssh stickies-prod3   'tail -F /var/log/stickies.log' > /tmp/stickies-prod3.log &
+ssh stickies-prod4   'tail -F /var/log/stickies.log' > /tmp/stickies-prod4.log &
+ssh stickies-prod5   'tail -F /var/log/stickies.log' > /tmp/stickies-prod5.log &
+ssh stickies-prod6   'tail -F /var/log/stickies.log' > /tmp/stickies-prod6.log &
+ssh stickies-prod7   'tail -F /var/log/stickies.log' > /tmp/stickies-prod7.log &
 ssh stickies-worker1 'tail -F /var/log/stickies.log' > /tmp/stickies-worker1.log &
 sleep 2
 trap 'kill $(jobs -p)' EXIT

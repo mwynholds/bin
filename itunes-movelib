@@ -1,5 +1,0 @@
-#!/bin/bash
-
-before=file://localhost/Volumes/Media/iTunes%20Media
-after=file://localhost/Users/mike/Music/iTunes/iTunes%20Media
-cat "$1" | sed s#$before#$after#g

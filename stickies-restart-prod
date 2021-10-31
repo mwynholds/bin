@@ -1,0 +1,16 @@
+#!/bin/bash
+
+ssh stickies-prod1 "sudo systemctl restart stickies"
+sleep 5
+ssh stickies-prod2 "sudo systemctl restart stickies"
+sleep 5
+ssh stickies-prod3 "sudo systemctl restart stickies"
+sleep 5
+ssh stickies-prod4 "sudo systemctl restart stickies"
+sleep 5
+ssh stickies-prod5 "sudo systemctl restart stickies"
+sleep 5
+ssh stickies-prod6 "sudo systemctl restart stickies"
+sleep 5
+ssh stickies-prod7 "sudo systemctl restart stickies"
+ssh stickies-worker1 "sudo systemctl restart stickies"

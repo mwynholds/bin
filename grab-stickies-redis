@@ -1,0 +1,3 @@
+#!/bin/bash
+
+scp root@stickies-db1:/var/lib/redis/dump.rdb ~/Projects/DUMPS

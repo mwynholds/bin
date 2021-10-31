@@ -18,7 +18,7 @@ tmux send-keys "~/bin/tail-stickies-prod" C-m
 tmux select-pane -t 2
 tmux split-window -v
 tmux select-pane -t 2
-tmux send-keys "ssh stickies-db -t 'htop -d 5'" C-m
+tmux send-keys "ssh stickies-db1 -t 'htop -d 5'" C-m
 tmux select-pane -t 3
 tmux send-keys "ssh stickies-worker1 -t 'htop -d 5'" C-m
 
@@ -35,7 +35,7 @@ tmux send-keys "ssh stickies-prod1 -t 'htop -d 5'" C-m
 tmux select-pane -t 1
 tmux send-keys "ssh stickies-prod2 -t 'htop -d 5'" C-m
 tmux select-pane -t 2
-tmux send-keys "ssh stickies-db -t 'htop -d 5'" C-m
+tmux send-keys "ssh stickies-prod3 -t 'htop -d 5'" C-m
 #tmux select-pane -t 3
 #tmux send-keys "ssh stickies-prod4 -t 'htop -d 5'" C-m
 

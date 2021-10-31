@@ -42,7 +42,7 @@ end
 
 grep = time_start.strftime "%F"
 
-(1..3).each do |n|
+(1..7).each do |n|
   IO.popen("ssh stickies-prod#{n} 'grep -h -A 999999 #{grep} /var/log/stickies.log*'") { |f| parse f, n, format(time_start), format(time_end) }
 end
 

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+servers="stickies-acceptance1 stickies-acceptance2 stickies-prod1 stickies-prod2 stickies-prod3 stickies-worker1"
+
+for server in $servers; do
+  key=/tmp/public_key_stickies.tmp
+  scp $1 $server:$key
+  ssh $server "grep -q -f $key .ssh/authorized_keys || cat $key >> .ssh/authorized_keys"
+  ssh $server "rm -f $key"
+done

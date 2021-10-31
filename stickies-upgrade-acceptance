@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for server in stickies-acceptance1 stickies-acceptance2; do
+  ssh root@$server "apt-get update"
+  ssh root@$server "apt-get upgrade -y"
+  ssh root@$server "apt-get autoremove -y"
+  ssh root@$server "/sbin/shutdown -r now"
+done

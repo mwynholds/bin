@@ -1,5 +1,5 @@
 #!/bin/sh
 
 rm -rf stickies stickies.zip
-ssh deploy@stickies-db ./remote-dump > stickies.zip
+ssh deploy@stickies-db1 ./remote-dump > stickies.zip
 unzip ./stickies.zip

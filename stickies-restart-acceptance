@@ -1,0 +1,4 @@
+#!/bin/bash
+
+ssh stickies-acceptance1 "sudo systemctl restart stickies"
+ssh stickies-acceptance2 "sudo systemctl restart stickies"

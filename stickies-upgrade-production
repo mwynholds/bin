@@ -1,0 +1,11 @@
+#!/bin/bash
+
+for server in stickies-prod1 stickies-prod2 stickies-prod3 stickies-prod4 stickies-prod5 stickies-prod6 stickies-prod7 stickies-worker1; do
+  echo ""
+  echo "Upgrading $server..."
+  echo ""
+  ssh root@$server "apt-get update"
+  ssh root@$server "apt-get upgrade -y"
+  ssh root@$server "apt-get autoremove -y"
+  ssh root@$server "/sbin/shutdown -r now"
+done
